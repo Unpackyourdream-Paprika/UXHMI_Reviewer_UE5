@@ -1,57 +1,60 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import CSVViewer from './components/CSVViewer';
-import fs from 'fs/promises';
-import path from 'path';
 
 export default function Home() {
-  const [csvData, setCsvData] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const [csvData, setCsvData] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function loadLatestCSV() {
+    async function loadCSV() {
       try {
         const response = await fetch('/api/getLatestCSV');
         if (!response.ok) {
-          throw new Error('Failed to fetch CSV data');
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch CSV file');
         }
         const data = await response.text();
         setCsvData(data);
       } catch (err) {
-        setError('Failed to load CSV file. Please check the network connection.');
-        console.error('Error loading CSV:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load CSV file');
+      } finally {
+        setIsLoading(false);
       }
     }
 
-    loadLatestCSV();
+    loadCSV();
+
     // 1분마다 데이터 새로고침
-    const interval = setInterval(loadLatestCSV, 60000);
+    const interval = setInterval(loadCSV, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  if (error) {
-    return (
-      <div style={{ 
-        padding: '20px', 
-        color: '#ff6b6b',
-        textAlign: 'center' 
-      }}>
-        {error}
-      </div>
-    );
-  }
-
   return (
-    <main className="csv-viewer">
-      {csvData ? <CSVViewer data={csvData} /> : (
-        <div style={{ 
-          padding: '20px', 
-          textAlign: 'center' 
-        }}>
-          Loading data...
+    <main className="min-h-screen bg-gray-100 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-lg shadow">
+          <div className="px-4 py-5 sm:p-6">
+            {error && (
+              <div className="p-4 mb-4 text-red-700 bg-red-100 rounded">
+                {error}
+              </div>
+            )}
+
+            {isLoading && (
+              <div className="p-4 text-gray-700">
+                Loading CSV data...
+              </div>
+            )}
+
+            {csvData && !isLoading && (
+              <CSVViewer data={csvData} />
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </main>
   );
 } 

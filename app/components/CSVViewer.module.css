@@ -48,23 +48,34 @@
   top: 0;
   z-index: 3;
   background: #1a1a1a;
-  padding: 2px 4px;
+  padding: 1px 2px;
   font-weight: bold;
   text-align: left;
   white-space: nowrap;
-  font-size: 14px;
+  font-size: 12px;
   border: none;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #ffffff;
 }
 
 .table td {
-  padding: 2px 4px;
+  padding: 0px 2px;
   white-space: nowrap;
-  font-size: 14px;
+  font-size: 12px;
   border: none;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #ffffff;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.table th, .table td {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .watermark {
@@ -86,54 +97,10 @@
   justify-content: center;
 }
 
-.vehicleSection {
-  width: 33.33%;
-}
-
-.vehicleSection .watermark {
-  color: rgba(255, 100, 100, 0.3);
-  left: 0;
-}
-
-.behaviorSection {
-  width: 33.33%;
-}
-
-.behaviorSection .watermark {
-  color: rgba(100, 255, 100, 0.3);
-  left: 33.33%;
-}
-
-.smarteyeSection {
-  width: 33.33%;
-}
-
-.smarteyeSection .watermark {
-  color: rgba(100, 100, 255, 0.3);
-  left: 66.66%;
-}
-
-.sectionTitle {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-  color: #ffffff;
-}
-
-.table tbody tr {
-  background: transparent;
-}
-
-.table tbody tr:hover {
-  background: rgba(45, 45, 45, 0.5);
-}
-
 .numericCell {
-  text-align: right;
   font-family: monospace;
+  padding-right: 4px;
+  text-align: left;
 }
 
 .noData {
@@ -143,16 +110,9 @@
   font-size: 16px;
 }
 
-.headerRow {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  background: #1a1a1a;
-}
-
 .container::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 .container::-webkit-scrollbar-track {
@@ -161,9 +121,13 @@
 
 .container::-webkit-scrollbar-thumb {
   background: #444;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .container::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.table tbody tr:hover {
+  background: rgba(45, 45, 45, 0.5);
 } 

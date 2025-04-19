@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 
 export async function GET() {
@@ -8,7 +8,7 @@ export async function GET() {
     console.log('Accessing network path:', networkPath);
 
     // 1. 디렉토리 내 파일 목록 읽기
-    const files = fs.readdirSync(networkPath);
+    const files = await fs.readdir(networkPath);
     console.log('Files in directory:', files);
 
     // 2. 타임머신 CSV 파일 필터링
@@ -34,7 +34,7 @@ export async function GET() {
 
     // 4. 파일 읽기
     const filePath = path.join(networkPath, latestFile);
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    const fileContent = await fs.readFile(filePath, 'utf-8');
     console.log('File content length:', fileContent.length);
 
     // 5. 응답 반환
@@ -48,11 +48,11 @@ export async function GET() {
       },
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error accessing file:', error);
     return NextResponse.json({
       error: 'Failed to access CSV file',
-      details: error.message
+      message: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 } 

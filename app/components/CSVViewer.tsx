@@ -12,6 +12,7 @@ interface Section {
   watermark: string;
   columns: string[];
   displayNames: { [key: string]: string };
+  columnWidths?: { [key: string]: string };
 }
 
 const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
@@ -28,7 +29,7 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
       }
     },
     {
-      watermark: 'VCR',
+      watermark: 'VCRM Data',
       columns: ['scenario', 'carName', 'idleTime', 'rpm', 'velocity', 'torque', 'gear', 'steering', 'accelerator', 'brake'],
       displayNames: {
         'scenario': 'Scene',
@@ -44,7 +45,21 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
       }
     },
     {
-      watermark: 'BHV',
+      watermark: 'Eye Tracking Data',
+      columns: ['fps', 'LeftClosestWindScreen', 'RightClosestWindScreen'],
+      displayNames: {
+        'fps': 'FPS',
+        'LeftClosestWindScreen': 'Left',
+        'RightClosestWindScreen': 'Right'
+      },
+      columnWidths: {
+        'fps': '60px',
+        'LeftClosestWindScreen': '80px',
+        'RightClosestWindScreen': '80px'
+      }
+    },
+    {
+      watermark: 'Behavior Detection Data',
       columns: ['isSleep', 'isPhone', 'isDrinking', 'HOD_Dir', 'Sgaze', 'is_drowsy', 'dominant_emotion', 'dominant_action_confidence'],
       displayNames: {
         'isSleep': 'Sleep',
@@ -55,15 +70,6 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
         'is_drowsy': 'Drowsy',
         'dominant_emotion': 'Emotion',
         'dominant_action_confidence': 'Action'
-      }
-    },
-    {
-      watermark: 'EYE',
-      columns: ['fps', 'LeftClosestWindScreen', 'RightClosestWindScreen'],
-      displayNames: {
-        'fps': 'FPS',
-        'LeftClosestWindScreen': 'Left World',
-        'RightClosestWindScreen': 'Right World'
       }
     }
   ];
@@ -87,10 +93,6 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
 
             const headers = validData[0];
             const rows = validData.slice(1);
-
-            console.log('Headers:', headers);
-            console.log('First row:', rows[0]);
-            console.log('Total rows:', rows.length);
 
             setHeaders(headers.map((h: string) => String(h).trim()));
             setParsedData(rows.map(row => 
@@ -122,7 +124,6 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
         const index = headers.findIndex(header => {
           const headerStr = String(header).toLowerCase();
           const colNameStr = colName.toLowerCase();
-          // 부분 매칭을 위한 로직 개선
           return headerStr.includes(colNameStr.replace('windscreen', '')) || 
                  colNameStr.includes(headerStr.replace('windscreen', ''));
         });
@@ -157,89 +158,46 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.section}>
-        <div className={styles.watermark}>VCRM Data</div>
-        <div className={styles.tableWrapper}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                {getColumnIndices(sections[1]).map((colIndex) => (
-                  <th key={colIndex}>
-                    {sections[1].displayNames[headers[colIndex]] || headers[colIndex]}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {parsedData.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {getColumnIndices(sections[1]).map((colIndex) => (
-                    <td key={colIndex} className={typeof row[colIndex] === 'number' ? styles.numericCell : ''}>
-                      {formatValue(row[colIndex])}
-                    </td>
+      {sections.slice(1).map((section, sectionIndex) => (
+        <div key={sectionIndex} className={styles.section}>
+          <div className={styles.watermark}>{section.watermark}</div>
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  {getColumnIndices(section).map((colIndex) => (
+                    <th 
+                      key={colIndex}
+                      style={section.columnWidths?.[headers[colIndex]] ? 
+                        { width: section.columnWidths[headers[colIndex]], maxWidth: section.columnWidths[headers[colIndex]] } : 
+                        undefined}
+                    >
+                      {section.displayNames[headers[colIndex]] || headers[colIndex]}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className={styles.section}>
-        <div className={styles.watermark}>Eye Tracking Data</div>
-        <div className={styles.tableWrapper}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                {getColumnIndices(sections[3]).map((colIndex) => (
-                  <th key={colIndex}>
-                    {sections[3].displayNames[headers[colIndex]] || headers[colIndex]}
-                  </th>
+              </thead>
+              <tbody>
+                {parsedData.map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {getColumnIndices(section).map((colIndex) => (
+                      <td 
+                        key={colIndex} 
+                        className={typeof row[colIndex] === 'number' ? styles.numericCell : ''}
+                        style={section.columnWidths?.[headers[colIndex]] ? 
+                          { width: section.columnWidths[headers[colIndex]], maxWidth: section.columnWidths[headers[colIndex]] } : 
+                          undefined}
+                      >
+                        {formatValue(row[colIndex])}
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
-              {parsedData.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {getColumnIndices(sections[3]).map((colIndex) => (
-                    <td key={colIndex} className={typeof row[colIndex] === 'number' ? styles.numericCell : ''}>
-                      {formatValue(row[colIndex])}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-
-      <div className={styles.section}>
-        <div className={styles.watermark}>Behavior Detection Data</div>
-        <div className={styles.tableWrapper}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                {getColumnIndices(sections[2]).map((colIndex) => (
-                  <th key={colIndex}>
-                    {sections[2].displayNames[headers[colIndex]] || headers[colIndex]}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {parsedData.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {getColumnIndices(sections[2]).map((colIndex) => (
-                    <td key={colIndex} className={typeof row[colIndex] === 'number' ? styles.numericCell : ''}>
-                      {formatValue(row[colIndex])}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      ))}
     </div>
   );
 };
