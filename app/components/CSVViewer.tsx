@@ -70,7 +70,7 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
       }
     },
     {
-      watermark: 'Gaze Data',
+      watermark: 'EYE TRACK DATA',
       columns: ['fps', 'Gaze', 'LeftClosestWorldIntersection', 'RightClosestWorldIntersection'],
       displayNames: {
         'fps': 'FPS',
