@@ -1,0 +1,133 @@
+@font-face {
+  font-family: 'HyundaiSans';
+  src: url('/fonts/HyundaiSansHeadKRBold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'HyundaiSans';
+  src: url('/fonts/HyundaiSansHeadKRLight.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'HyundaiSans';
+  src: url('/fonts/HyundaiSansTextKRRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 26, 26, 26;
+  --border-vehicle: #4dabf7;
+  --border-behavior: #ff922b;
+  --border-smarteye: #be4bdb;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: 'HyundaiSans', sans-serif;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background: rgb(var(--background-rgb));
+  color: rgb(var(--foreground-rgb));
+}
+
+body {
+  min-height: 100vh;
+}
+
+.csv-viewer {
+  padding: 10px;
+  width: 100%;
+}
+
+.table-container {
+  width: 100%;
+}
+
+.csv-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 11px;
+  table-layout: fixed;
+}
+
+.csv-table th,
+.csv-table td {
+  border: 1px solid #333;
+  padding: 4px 6px;
+  text-align: left;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100px;
+}
+
+.csv-table th {
+  background: #111;
+  font-weight: bold;
+  font-size: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.csv-table tr:nth-child(even) {
+  background: #111;
+}
+
+.csv-table tr:hover {
+  background: #222;
+}
+
+/* Data source grouping */
+.group-vehicle th {
+  border-top: 2px solid var(--border-vehicle);
+}
+
+.group-behavior th {
+  border-top: 2px solid var(--border-behavior);
+}
+
+.group-smarteye th {
+  border-top: 2px solid var(--border-smarteye);
+}
+
+/* Column width adjustments */
+.csv-table th:nth-child(1),
+.csv-table td:nth-child(1) {
+  width: 80px;
+}
+
+.csv-table th:nth-child(2),
+.csv-table td:nth-child(2),
+.csv-table th:nth-child(3),
+.csv-table td:nth-child(3) {
+  width: 60px;
+}
+
+.csv-table th:nth-child(4),
+.csv-table td:nth-child(4),
+.csv-table th:nth-child(5),
+.csv-table td:nth-child(5),
+.csv-table th:nth-child(6),
+.csv-table td:nth-child(6) {
+  width: 40px;
+}
+
+.csv-table td[data-type="number"] {
+  text-align: right;
+  font-family: 'HyundaiSans', monospace;
+  font-size: 10px;
+} 
