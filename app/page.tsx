@@ -33,9 +33,9 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gray-100 py-8">
+    <main className="min-h-screen bg-[#1a1a1a] text-white p-4" style={{ background: '#1a1a1a' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow">
+        <div className="bg-[#1a1a1a] rounded-lg shadow">
           <div className="px-4 py-5 sm:p-6">
             {error && (
               <div className="p-4 mb-4 text-red-700 bg-red-100 rounded">

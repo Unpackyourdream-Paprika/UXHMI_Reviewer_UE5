@@ -23,39 +23,66 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
   const sections: Section[] = [
     {
       watermark: 'VCRM Data',
-      columns: ['timestamp', 'velocity', 'torque', 'gear', 'steering', 'accelerator', 'brake'],
+      columns: ['timestamp', 'velocity', 'torque', 'gear', 'steering', 'acceleator', 'brake', 'hor', 'eor', 'dca'],
       displayNames: {
         'timestamp': 'Time',
         'velocity': 'Velocity',
-        'torque': 'Torq',
+        'torque': 'Torque',
         'gear': 'Gear',
-        'steering': 'Str',
-        'accelerator': 'Acc',
-        'brake': 'Brk'
+        'steering': 'Steering',
+        'acceleator': 'Accelerator',
+        'brake': 'Brake',
+        'hor': 'HOR',
+        'eor': 'EOR',
+        'dca': 'DCA'
       },
       columnWidths: {
-        'timestamp': '80px'
+        'timestamp': '15%',
+        'velocity': '15%',
+        'torque': '15%',
+        'gear': '12%',
+        'steering': '15%',
+        'acceleator': '15%',
+        'brake': '12%',
+        'hor': '12%',
+        'eor': '12%',
+        'dca': '12%'
       }
     },
     {
       watermark: 'Behavior Detection Data',
-      columns: ['isSleep', 'isPhone', 'isDrinking', 'is_drowsy', 'dominant_emotion', 'dominant_action', 'Sgaze', 'fps', 'LeftClosestWorldIntersection', 'RightClosestWorldIntersection'],
+      columns: ['isSleep', 'isPhone', 'isDrinking', 'is_drowsy', 'dominant_emotion', 'dominant_action'],
       displayNames: {
         'isSleep': 'Sleep',
         'isPhone': 'Phone',
         'isDrinking': 'Drink',
         'is_drowsy': 'Drowsy',
         'dominant_emotion': 'Emotion',
-        'dominant_action': 'Action',
-        'Sgaze': 'Gaze',
+        'dominant_action': 'Action'
+      },
+      columnWidths: {
+        'isSleep': '12%',
+        'isPhone': '12%',
+        'isDrinking': '12%',
+        'is_drowsy': '12%',
+        'dominant_emotion': '12%',
+        'dominant_action': '12%'
+      }
+    },
+    {
+      watermark: 'Gaze Data',
+      columns: ['fps', 'Gaze', 'LeftClosestWorldIntersection', 'RightClosestWorldIntersection'],
+      displayNames: {
         'fps': 'FPS',
+        'Gaze': 'Gaze',
         'LeftClosestWorldIntersection': 'Left World',
         'RightClosestWorldIntersection': 'Right World'
       },
       columnWidths: {
-        'fps': '60px',
-        'LeftClosestWorldIntersection': '100px',
-        'RightClosestWorldIntersection': '100px'
+        'fps': '1%',
+        'Gaze': '1.5%',
+        'LeftClosestWorldIntersection': '2%',
+        'RightClosestWorldIntersection': '2%'
       }
     }
   ];
@@ -67,10 +94,15 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
       Papa.parse(data, {
         complete: (results: Papa.ParseResult<any>) => {
           if (results.data && Array.isArray(results.data)) {
-            // 빈 행이나 불완전한 행 제거
+            console.log('Raw data length:', results.data.length);
+            
+            // 완전히 빈 행만 제거
             const validData = results.data.filter(row => 
-              Array.isArray(row) && row.length > 1 && row.some(cell => cell !== '')
+              Array.isArray(row) && row.length > 0 && row.some(cell => cell !== null)
             );
+
+            console.log('Valid data length:', validData.length);
+            console.log('First few rows:', validData.slice(0, 3));
 
             if (validData.length === 0) {
               console.error('No valid data found');
@@ -78,22 +110,27 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
             }
 
             const headers = validData[0];
-            const rows = validData.slice(1);
+            // 중복된 행 제거
+            const uniqueRows = validData.slice(1).filter((row, index, self) =>
+              index === self.findIndex((r) => JSON.stringify(r) === JSON.stringify(row))
+            );
+
+            console.log('Unique rows length:', uniqueRows.length);
 
             setHeaders(headers.map((h: string) => String(h).trim()));
-            setParsedData(rows.map(row => 
+            setParsedData(uniqueRows.map(row => 
               row.map((cell: any) => {
-                if (cell === null || cell === undefined || cell === '') return '';
+                if (cell === null || cell === undefined || cell === '') return '-';
                 // 숫자 처리
                 const num = Number(cell);
                 if (!isNaN(num)) return num;
-                return String(cell).trim();
+                return String(cell).trim() || '-';
               })
             ));
           }
         },
         header: false,
-        skipEmptyLines: true,
+        skipEmptyLines: false,
         delimiter: ',',
         dynamicTyping: true
       });
@@ -110,8 +147,8 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
         const index = headers.findIndex(header => {
           const headerStr = String(header).toLowerCase();
           const colNameStr = colName.toLowerCase();
-          return headerStr.includes(colNameStr.replace('windscreen', '')) || 
-                 colNameStr.includes(headerStr.replace('windscreen', ''));
+          // 정확한 컬럼 이름 매칭
+          return headerStr === colNameStr;
         });
         if (index === -1) {
           console.warn(`Column not found: ${colName}`);
@@ -123,17 +160,25 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
 
   const formatValue = (value: any, columnName: string): string => {
     if (value === null || value === undefined || value === '') return '-';
+    
+    // Boolean 값 변환 (isSleep, isPhone, isDrinking, is_drowsy)
+    if (columnName === 'isSleep' || columnName === 'isPhone' || columnName === 'isDrinking' || columnName === 'is_drowsy') {
+      if (value === 0 || value === '0' || value.toString().toLowerCase() === 'no') return 'FALSE';
+      if (value === 1 || value === '1' || value.toString().toLowerCase() === 'yes') return 'TRUE';
+      return String(value);
+    }
+    
     if (columnName === 'timestamp') {
-      // 타임스탬프를 시간 형식(HH:MM:SS)으로 변환
       const date = new Date(value);
       return date.toTimeString().split(' ')[0];
     }
+    
     if (typeof value === 'number') {
-      return Math.abs(value) < 0.01 ? value.toExponential(2) : 
-             Number.isInteger(value) ? value.toString() : 
-             value.toFixed(4);
+      if (value === 0) return '0';
+      return Number.isInteger(value) ? value.toString() : value.toFixed(2);
     }
-    return String(value);
+    
+    return String(value).trim() || '-';
   };
 
   if (!parsedData.length) {
@@ -150,12 +195,7 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
               <thead>
                 <tr>
                   {getColumnIndices(section).map((colIndex) => (
-                    <th 
-                      key={colIndex}
-                      style={section.columnWidths?.[headers[colIndex]] ? 
-                        { width: section.columnWidths[headers[colIndex]], maxWidth: section.columnWidths[headers[colIndex]] } : 
-                        undefined}
-                    >
+                    <th key={colIndex}>
                       {section.displayNames[headers[colIndex]] || headers[colIndex]}
                     </th>
                   ))}
@@ -168,9 +208,6 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
                       <td 
                         key={colIndex} 
                         className={typeof row[colIndex] === 'number' ? styles.numericCell : ''}
-                        style={section.columnWidths?.[headers[colIndex]] ? 
-                          { width: section.columnWidths[headers[colIndex]], maxWidth: section.columnWidths[headers[colIndex]] } : 
-                          undefined}
                       >
                         {formatValue(row[colIndex], headers[colIndex])}
                       </td>
