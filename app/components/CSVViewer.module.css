@@ -118,6 +118,11 @@
   background: #555;
 }
 
+.highlightedRow {
+  background-color: rgba(255, 165, 0, 0.2) !important;
+  transition: background-color 0.3s ease;
+}
+
 .table tbody tr:hover {
   background: rgba(45, 45, 45, 0.5);
 } 

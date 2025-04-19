@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Papa from 'papaparse';
 import styles from './CSVViewer.module.css';
 
@@ -18,6 +18,8 @@ interface Section {
 const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
   const [parsedData, setParsedData] = useState<any[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
+  const [currentRowIndex, setCurrentRowIndex] = useState<number>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // 섹션별 컬럼 정의
   const sections: Section[] = [
@@ -139,6 +141,31 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
     }
   }, [data]);
 
+  useEffect(() => {
+    if (!parsedData.length) return;
+
+    const scrollInterval = setInterval(() => {
+      setCurrentRowIndex((prevIndex) => {
+        const nextIndex = prevIndex + 1;
+        if (nextIndex >= parsedData.length) {
+          return 0; // Reset to top when reaching the bottom
+        }
+        return nextIndex;
+      });
+    }, 500); // 0.5초마다 업데이트
+
+    return () => clearInterval(scrollInterval);
+  }, [parsedData]);
+
+  useEffect(() => {
+    if (!containerRef.current || currentRowIndex === 0) return;
+
+    const rowElement = document.querySelector(`[data-row-index="${currentRowIndex}"]`);
+    if (rowElement) {
+      rowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [currentRowIndex]);
+
   const getColumnIndices = (section: Section): number[] => {
     if (!headers.length) return [];
     
@@ -186,7 +213,7 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} ref={containerRef}>
       {sections.map((section, sectionIndex) => (
         <div key={sectionIndex} className={styles.section}>
           <div className={styles.watermark}>{section.watermark}</div>
@@ -203,7 +230,11 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
               </thead>
               <tbody>
                 {parsedData.map((row, rowIndex) => (
-                  <tr key={rowIndex}>
+                  <tr 
+                    key={rowIndex}
+                    data-row-index={rowIndex}
+                    className={`${rowIndex === currentRowIndex ? styles.highlightedRow : ''}`}
+                  >
                     {getColumnIndices(section).map((colIndex) => (
                       <td 
                         key={colIndex} 
