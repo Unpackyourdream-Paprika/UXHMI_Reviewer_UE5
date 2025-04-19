@@ -31,7 +31,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
   margin: 0;
   padding: 0;
 }
@@ -48,34 +48,24 @@
   top: 0;
   z-index: 3;
   background: #1a1a1a;
-  padding: 1px 2px;
+  padding: 1px 4px;
   font-weight: bold;
   text-align: left;
-  white-space: nowrap;
+  white-space: normal;
   font-size: 12px;
   border: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
   color: #ffffff;
 }
 
 .table td {
-  padding: 0px 2px;
-  white-space: nowrap;
+  padding: 1px 4px;
+  white-space: normal;
   font-size: 12px;
   border: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
   color: #ffffff;
   line-height: 1.2;
   text-align: left;
-}
-
-.table th, .table td {
-  max-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-all;
 }
 
 .watermark {

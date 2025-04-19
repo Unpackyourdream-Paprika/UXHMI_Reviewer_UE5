@@ -22,54 +22,40 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
   // 섹션별 컬럼 정의
   const sections: Section[] = [
     {
-      watermark: 'T',
-      columns: ['timestamp'],
-      displayNames: {
-        'timestamp': 'Time'
-      }
-    },
-    {
       watermark: 'VCRM Data',
-      columns: ['scenario', 'carName', 'idleTime', 'rpm', 'velocity', 'torque', 'gear', 'steering', 'accelerator', 'brake'],
+      columns: ['timestamp', 'velocity', 'torque', 'gear', 'steering', 'accelerator', 'brake'],
       displayNames: {
-        'scenario': 'Scene',
-        'carName': 'Car',
-        'idleTime': 'Idle',
-        'rpm': 'RPM',
-        'velocity': 'Vel',
+        'timestamp': 'Time',
+        'velocity': 'Velocity',
         'torque': 'Torq',
         'gear': 'Gear',
         'steering': 'Str',
         'accelerator': 'Acc',
         'brake': 'Brk'
-      }
-    },
-    {
-      watermark: 'Eye Tracking Data',
-      columns: ['fps', 'LeftClosestWindScreen', 'RightClosestWindScreen'],
-      displayNames: {
-        'fps': 'FPS',
-        'LeftClosestWindScreen': 'Left',
-        'RightClosestWindScreen': 'Right'
       },
       columnWidths: {
-        'fps': '60px',
-        'LeftClosestWindScreen': '80px',
-        'RightClosestWindScreen': '80px'
+        'timestamp': '80px'
       }
     },
     {
       watermark: 'Behavior Detection Data',
-      columns: ['isSleep', 'isPhone', 'isDrinking', 'HOD_Dir', 'Sgaze', 'is_drowsy', 'dominant_emotion', 'dominant_action_confidence'],
+      columns: ['isSleep', 'isPhone', 'isDrinking', 'is_drowsy', 'dominant_emotion', 'dominant_action', 'Sgaze', 'fps', 'LeftClosestWorldIntersection', 'RightClosestWorldIntersection'],
       displayNames: {
         'isSleep': 'Sleep',
         'isPhone': 'Phone',
         'isDrinking': 'Drink',
-        'HOD_Dir': 'HoD',
-        'Sgaze': 'Gaze',
         'is_drowsy': 'Drowsy',
         'dominant_emotion': 'Emotion',
-        'dominant_action_confidence': 'Action'
+        'dominant_action': 'Action',
+        'Sgaze': 'Gaze',
+        'fps': 'FPS',
+        'LeftClosestWorldIntersection': 'Left World',
+        'RightClosestWorldIntersection': 'Right World'
+      },
+      columnWidths: {
+        'fps': '60px',
+        'LeftClosestWorldIntersection': '100px',
+        'RightClosestWorldIntersection': '100px'
       }
     }
   ];
@@ -135,15 +121,13 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
       .filter(index => index !== -1);
   };
 
-  const formatValue = (value: any): string => {
+  const formatValue = (value: any, columnName: string): string => {
     if (value === null || value === undefined || value === '') return '-';
-    
-    // 타임스탬프 포맷팅
-    if (typeof value === 'string' && value.includes('-') && value.includes(':')) {
-      const time = value.split(' ')[1];  // "11:55:39" 부분만 추출
-      return time;
+    if (columnName === 'timestamp') {
+      // 타임스탬프를 시간 형식(HH:MM:SS)으로 변환
+      const date = new Date(value);
+      return date.toTimeString().split(' ')[0];
     }
-    
     if (typeof value === 'number') {
       return Math.abs(value) < 0.01 ? value.toExponential(2) : 
              Number.isInteger(value) ? value.toString() : 
@@ -158,7 +142,7 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
 
   return (
     <div className={styles.container}>
-      {sections.slice(1).map((section, sectionIndex) => (
+      {sections.map((section, sectionIndex) => (
         <div key={sectionIndex} className={styles.section}>
           <div className={styles.watermark}>{section.watermark}</div>
           <div className={styles.tableWrapper}>
@@ -188,7 +172,7 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
                           { width: section.columnWidths[headers[colIndex]], maxWidth: section.columnWidths[headers[colIndex]] } : 
                           undefined}
                       >
-                        {formatValue(row[colIndex])}
+                        {formatValue(row[colIndex], headers[colIndex])}
                       </td>
                     ))}
                   </tr>
