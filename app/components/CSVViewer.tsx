@@ -212,10 +212,15 @@ const CSVViewer: React.FC<CSVViewerProps> = ({ data }) => {
     return <div className={styles.noData}>데이터를 불러오는 중...</div>;
   }
 
+
+  // console.log(parsedData, "parsedData???")
+
+
+
   return (
     <div className={styles.container} ref={containerRef}>
       {sections.map((section, sectionIndex) => (
-        <div key={sectionIndex} className={styles.section}>
+        <div key={sectionIndex} className={sectionIndex === 0 ? styles.sectionOne : sectionIndex === 1 ? styles.sectionTwo : styles.section}>
           <div className={styles.watermark}>{section.watermark}</div>
           <div className={styles.tableWrapper}>
             <table className={styles.table}>

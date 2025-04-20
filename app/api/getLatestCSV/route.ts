@@ -4,7 +4,8 @@ import path from 'path';
 
 export async function GET() {
   try {
-    const networkPath = '\\\\192.168.0.39\\csv\\2025-04-19';
+    const now = new Date();
+    const networkPath = `\\\\192.168.0.39\\csv\\${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate()}`;
     console.log('Accessing network path:', networkPath);
 
     // 1. 디렉토리 내 파일 목록 읽기
@@ -12,8 +13,8 @@ export async function GET() {
     console.log('Files in directory:', files);
 
     // 2. 타임머신 CSV 파일 필터링
-    const csvFiles = files.filter(file => 
-      file.startsWith('0_timemachine_') && 
+    const csvFiles = files.filter(file =>
+      file.startsWith('0_timemachine_') &&
       file.endsWith('.csv')
     );
     console.log('CSV files found:', csvFiles);

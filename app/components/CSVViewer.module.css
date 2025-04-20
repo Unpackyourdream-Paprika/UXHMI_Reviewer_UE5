@@ -7,12 +7,36 @@
   overflow: auto;
 }
 
+
+.sectionOne {
+  flex: 1;
+  position: relative;
+  background: #1a1a1a;
+  min-width: 40%;
+  max-width: 40%;
+  border-right: 1px solid #333;
+  padding: 0;
+  margin: 0;
+}
+
+.sectionTwo {
+  flex: 1;
+  position: relative;
+  background: #1a1a1a;
+  min-width: 35%;
+  max-width: 35%;
+  border-right: 1px solid #333;
+  padding: 0;
+  margin: 0;
+}
+
+
 .section {
   flex: 1;
   position: relative;
   background: #1a1a1a;
-  min-width: 33.33%;
-  max-width: 33.33%;
+  min-width: 25%;
+  max-width: 25%;
   border-right: 1px solid #333;
   padding: 0;
   margin: 0;
@@ -52,7 +76,7 @@
   font-weight: bold;
   text-align: left;
   white-space: normal;
-  font-size: 12px;
+  font-size: 16px;
   border: none;
   color: #ffffff;
 }
@@ -60,12 +84,13 @@
 .table td {
   padding: 0px 4px;
   white-space: normal;
-  font-size: 12px;
+  font-size: 16px;
   border: none;
   color: #ffffff;
   line-height: 1;
   text-align: left;
   word-break: break-all;
+  /* max-width: 70px !important; */
 }
 
 .watermark {
@@ -91,6 +116,7 @@
   font-family: monospace;
   padding-right: 4px;
   text-align: left;
+
 }
 
 .noData {
