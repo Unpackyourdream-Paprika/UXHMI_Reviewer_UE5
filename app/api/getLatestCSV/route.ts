@@ -5,12 +5,23 @@ import path from 'path';
 export async function GET() {
   try {
     const now = new Date();
-    const networkPath = `\\\\192.168.0.39\\csv\\${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate()}`;
+    const networkPath = `\\\\192.168.0.39\\csv\\${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
     console.log('Accessing network path:', networkPath);
 
     // 1. 디렉토리 내 파일 목록 읽기
     const files = await fs.readdir(networkPath);
     console.log('Files in directory:', files);
+
+    try {
+      await fs.access(networkPath);
+    } catch (accessError) {
+      // 디렉토리가 없으면 빈 응답 반환
+      console.log(`Directory does not exist: ${networkPath}`);
+      return NextResponse.json({
+        error: 'Directory not found',
+        message: 'The requested CSV directory is not available'
+      }, { status: 404 });
+    }
 
     // 2. 타임머신 CSV 파일 필터링
     const csvFiles = files.filter(file =>
